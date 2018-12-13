@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+      }
+      canvas{
+        border: solid 1px #CCC;  
+      }
+    </style>
+  </head>
+  <body >
+    <h3>利用抛物线公式,模拟火山喷发效果</h3>
+    <canvas id="cvs" width="500" height="400"></canvas>
+    <script src="funParabola-c.js"></script>
+    <script>
+      var cvs = document.querySelector('#cvs');
+      var ctx = cvs.getContext("2d");
+      var ballList = [];
+      function drawHill() {
+        ctx.beginPath();
+        ctx.fillStyle="#333";
+        ctx.moveTo(150, 300);
+        ctx.lineTo(200, 180);
+        ctx.lineTo(280, 180);
+        ctx.lineTo(330, 300);
+        ctx.closePath();
+        ctx.fill();    
+      }  
+
+      function draw() {
+        
+        if(ballList.length < 50) { //这里调数量
+          for(var i = 0; i < 1; i++){
+            var b = createBall();
+            ballList.push(b);                  
+          }
+        }
+        
+        ballList.forEach(function(item) {
+          var pos = item.f.move();
+          item.pos = pos;
+        });
+        for (var i = ballList.length - 1; i >= 0; i--) {
+          if (!ballList[i].pos) {
+            ballList.splice(i, 1);
+          }
+        }
+        drawObj()
+        window.requestAnimationFrame(draw);
+      }
+      draw()
+      function createBall() {
+        var sx = getRandom(200, 280);
+        var sy = 180;
+        var tx = getRandom(0, 500);
+        var ty = getRandom(400, 450);        
+        var arg = {
+          ctx: ctx,
+          sourceX: sx,
+          sourceY: sy,
+          targetX: tx,
+          targetY: ty,
+          pos: {
+            x: sx,
+            y: sy
+          }  
+        }
+        var f = funParabola(arg);
+        arg.f = f;
+        return arg;        
+      }
+      
+      
+      function drawObj() {
+        ctx.clearRect(0,0,500,400);
+        drawHill();
+        var arr = ballList;
+        for(var i = 0; i < arr.length; i++){
+          ctx.fillStyle= "#FE7445";
+          ctx.beginPath();
+          ctx.arc(arr[i].pos.x, arr[i].pos.y,10,0,2*Math.PI,true)
+          ctx.closePath();
+          ctx.fill()          
+        }
+      }
+      
+      function getRandom(min, max) {
+        var n = max - min;
+        var r = parseInt(Math.random()* n);
+        return min + r;
+      }
+      
+      draw();
+    </script>
+  </body>  
+</html>
+            
